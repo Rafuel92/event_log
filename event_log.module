@@ -27,9 +27,8 @@ function event_log_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_insert().
  */
 function event_log_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
-  if(_event_log_check_if_entity_is_enabled($entity)){
-    //@todo call logger service
-    dpm("insert ".$entity->label());
+  if(\Drupal::service('event_log.logger')->checkIfEntityIsEnabled($entity)){
+    \Drupal::service('event_log.logger')->createLogEntity($entity,'insert');
   }
 }
 
@@ -37,9 +36,8 @@ function event_log_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function event_log_entity_update(Drupal\Core\Entity\EntityInterface $entity) {
-  if(_event_log_check_if_entity_is_enabled($entity)){
-    //@todo call logger service
-    dpm("update ".$entity->label());
+  if(\Drupal::service('event_log.logger')->checkIfEntityIsEnabled($entity)){
+    \Drupal::service('event_log.logger')->createLogEntity($entity,'update');
   }
 }
 
@@ -47,31 +45,14 @@ function event_log_entity_update(Drupal\Core\Entity\EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function event_log_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
-  if(_event_log_check_if_entity_is_enabled($entity)){
-    //@todo call logger service
-    dpm("delete ".$entity->label());
+  if(\Drupal::service('event_log.logger')->checkIfEntityIsEnabled($entity)){
+    \Drupal::service('event_log.logger')->createLogEntity($entity,'delete');
   }
-}
-
-/**
- * Checks if logging is enabled on the entity
- * @param \Drupal\Core\Entity\EntityInterface $entity
- * @return bool
- */
-function _event_log_check_if_entity_is_enabled(Drupal\Core\Entity\EntityInterface $entity){
-  $entity_type_id = $entity->getEntityType()->id();
-  $event_log_config = \Drupal::config('event_log.config');
-  $event_log_content_entities = $event_log_config->get('enabled_content_entities') ? $event_log_config->get('enabled_content_entities') : [];
-  $event_log_config_entities = $event_log_config->get('enabled_config_entities') ? $event_log_config->get('enabled_config_entities') : [];
-  if(in_array($entity_type_id,$event_log_content_entities) || in_array($entity_type_id,$event_log_config_entities)){
-    return TRUE;
-  }
-  return FALSE;
 }
 
 /**
  * Implements hook_cron().
  */
 function event_log_cron() {
-
+  //@TODO remove old logs
 }

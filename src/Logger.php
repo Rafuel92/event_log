@@ -4,6 +4,8 @@ namespace Drupal\event_log;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Psr\Log\LoggerInterface as DrupalLogger;
 
 /**
@@ -27,16 +29,29 @@ class Logger implements LoggerInterface {
   private $config;
 
   /**
+   * Drupal\Core\Entity\EntityTypeManager definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
    * Logger constructor.
    *
    * @param \Drupal\event_log\StorageBackendPluginManagerInterface $storage_backend_plugin_manager
    * @param \Psr\Log\LoggerInterface $drupal_logger
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    */
-  public function __construct(StorageBackendPluginManagerInterface $storage_backend_plugin_manager, DrupalLogger $drupal_logger, ConfigFactoryInterface $config) {
+  public function __construct(
+    StorageBackendPluginManagerInterface $storage_backend_plugin_manager,
+    DrupalLogger $drupal_logger,
+    ConfigFactoryInterface $config,
+    EntityTypeManager $entity_type_manager
+  ) {
     $this->storageBackendPluginManager = $storage_backend_plugin_manager;
     $this->drupalLogger = $drupal_logger;
     $this->config = $config;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -57,5 +72,64 @@ class Logger implements LoggerInterface {
       ]);
     }
   }
+
+  /**
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   */
+  public function checkIfEntityIsEnabled(EntityInterface $entity){
+    $entity_type_id = $entity->getEntityType()->id();
+    $event_log_config = $this->config->get('event_log.config');
+    $event_log_content_entities = $event_log_config->get('enabled_content_entities') ? $event_log_config->get('enabled_content_entities') : [];
+    $event_log_config_entities = $event_log_config->get('enabled_config_entities') ? $event_log_config->get('enabled_config_entities') : [];
+    if(in_array($entity_type_id,$event_log_content_entities) || in_array($entity_type_id,$event_log_config_entities)){
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param $type
+   */
+  public function createLogEntity(EntityInterface $entity, $type) {
+    $values = [];
+    $values['type'][0]['value'] = $entity->getEntityType()->id() . '_' . $type;
+    $values['operation'][0]['value'] = $type;
+    $values['path'][0]['value'] = \Drupal::request()->getRequestUri();
+    $values['ref_numeric'][0]['value'] = $entity->id();
+    //manage title for standard nodes and name for custom content entities
+    $title = $entity->get('title');
+    if($title){
+      $title =  $title->getValue()[0]['value'];
+    } else {
+      $title =  $entity->get('name')->getValue()[0]['value'];
+    }
+    $values['ref_char'][0]['value'] = $title;
+    $values['description'][0]['value'] =  $this->getLogDescription($entity,$type);
+    $event_log_storage = $this->entityTypeManager->getStorage('event_log');
+    $event_log_entity = $event_log_storage->create($values);
+    $event_log_entity->save();
+  }
+
+  /**
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param $type
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   */
+  protected function getLogDescription(EntityInterface $entity, $type){
+    $name = \Drupal::currentUser()->getAccountName();
+    $uid = \Drupal::currentUser()->id();
+    $description = t('user %name (uid %uid) performed %type operation entity %entityname (id %id)', [
+        '%name' => $name,
+        '%uid' => $uid,
+        '%entityname' => $entity->getEntityType()->getLabel(),
+        '%id' => $entity->id(),
+        '%operation' => $type
+      ]
+    );
+    return $description;
+  }
+
 
 }
