@@ -28,6 +28,9 @@ use Drupal\user\UserInterface;
  *   },
  *   base_table = "event_log",
  *   admin_permission = "administer event log entities",
+ *   links = {
+ *     "canonical" = "/admin/event_log/{id}",
+ *   },
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
@@ -47,6 +50,7 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
     parent::preCreate($storage_controller, $values);
     $values += [
       'user_id' => \Drupal::currentUser()->id(),
+      'status' => TRUE,
     ];
   }
 
@@ -121,7 +125,7 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
    * {@inheritdoc}
    */
   public function setPublished($published) {
-    $this->set('status', TRUE);
+    $this->set('status', $published ? TRUE : FALSE);
     return $this;
   }
 
@@ -205,7 +209,7 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['path'] = BaseFieldDefinition::create('path')
+    $fields['path'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Path'))
       ->setDescription(t('Current path.'))
       ->setSetting('max_length', 255)
@@ -215,12 +219,11 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
         'weight' => 2,
       ])
       ->setDisplayOptions('form', [
-        'type' => 'path',
+        'type' => 'string_textfield',
         'weight' => 2,
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setComputed(TRUE);
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['ref_numeric'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Ref numeric'))
