@@ -108,6 +108,7 @@ class Logger implements LoggerInterface {
     $values['operation'][0]['value'] = $type;
     $values['path'][0]['value'] = $this->request->getCurrentRequest()->getRequestUri();
     $values['ref_numeric'][0]['value'] = $entity->id();
+    $entity_arr = $entity->toArray();
     //manage title for standard nodes and name for custom content entities
     $title = isset($entity->toArray()['title']) ? $entity->toArray()['title'][0]['value'] : FALSE;
     if(!$title){
@@ -115,6 +116,13 @@ class Logger implements LoggerInterface {
     }
     $values['name'][0]['value'] = $title;
     $values['description'][0]['value'] =  $this->getLogDescription($entity,$type);
+    $values['ip'][0]['value'] = $this->request->getCurrentRequest()->getClientIp();
+    if(isset($entity_arr['title'][0]['value'])){
+      $title = $entity_arr['title'][0]['value'];
+    } elseif(isset($entity_arr['name'][0]['value'])) {
+      $title = $entity_arr['name'][0]['value'];
+    }
+    $values['ref_title'][0]['value'] = $title;
     $event_log_storage = $this->entityTypeManager->getStorage('event_log');
     $event_log_entity = $event_log_storage->create($values);
     $event_log_entity->save();
@@ -124,19 +132,13 @@ class Logger implements LoggerInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param $type
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    */
   protected function getLogDescription(EntityInterface $entity, $type){
     $name = \Drupal::currentUser()->getAccountName();
     $uid = \Drupal::currentUser()->id();
-    $description = t('user %name (uid %uid) performed %type operation on entity %entityname (id %id)', [
-        '%name' => $name,
-        '%uid' => $uid,
-        '%entityname' => $entity->getEntityType()->getLabel(),
-        '%id' => $entity->id(),
-        '%operation' => $type
-      ]
-    );
+    $entname = $entity->getEntityType()->getLabel();
+    $entid = $entity->id();
+    $description = "user $name (uid $uid) performed $type operation on entity $entname (id $entid)";
     return $description;
   }
 

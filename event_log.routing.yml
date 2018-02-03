@@ -1,4 +1,3 @@
-
 event_log.config_form:
   path: '/admin/config/event_log'
   defaults:

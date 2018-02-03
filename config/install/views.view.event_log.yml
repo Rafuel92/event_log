@@ -2,8 +2,13 @@ uuid: 08bb9deb-184d-40c1-b36f-c5333b2e19a7
 langcode: en
 status: true
 dependencies:
+  config:
+    - system.menu.admin
   module:
     - event_log
+    - user
+_core:
+  default_config_hash: AuKiU-VEbAxZMMlvvQ4VjtPQohJ7Wr7g5K6JeM8SjZo
 id: event_log
 label: 'Event log'
 module: views
@@ -20,8 +25,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'view event log entities'
       cache:
         type: tag
         options: {  }
@@ -94,7 +100,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          label: Created
+          label: date
           exclude: false
           alter:
             alter_text: false
@@ -153,6 +159,71 @@ display:
           field_api_classes: false
           entity_type: event_log
           entity_field: created
+          plugin_id: field
+        user_id:
+          id: user_id
+          table: event_log
+          field: user_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: 'Authored by'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: target_id
+          type: entity_reference_label
+          settings:
+            link: true
+          group_column: target_id
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: event_log
+          entity_field: user_id
           plugin_id: field
         name:
           id: name
@@ -414,71 +485,6 @@ display:
           entity_type: event_log
           entity_field: description
           plugin_id: field
-        info:
-          id: info
-          table: event_log
-          field: info
-          relationship: none
-          group_type: group
-          admin_label: ''
-          label: Info
-          exclude: false
-          alter:
-            alter_text: false
-            text: ''
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: value
-          type: string
-          settings:
-            link_to_entity: false
-          group_column: value
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
-          entity_type: event_log
-          entity_field: info
-          plugin_id: field
         ip:
           id: ip
           table: event_log
@@ -544,87 +550,183 @@ display:
           entity_type: event_log
           entity_field: ip
           plugin_id: field
-        ref_numeric:
-          id: ref_numeric
+      filters:
+        ip:
+          id: ip
           table: event_log
-          field: ref_numeric
+          field: ip
           relationship: none
           group_type: group
           admin_label: ''
-          label: ID
-          exclude: false
-          alter:
-            alter_text: false
-            text: ''
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: value
-          type: number_integer
-          settings:
-            thousand_separator: ''
-            prefix_suffix: true
-          group_column: value
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: ip_op
+            label: IP
+            description: ''
+            use_operator: false
+            operator: ip_op
+            identifier: ip
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+              shop_administrator: '0'
+              fe_app: '0'
+              visitor_customer: '0'
+              visitor_filial: '0'
+              buyer_admin: '0'
+              buyer_agent: '0'
+              buyer_area_manager_export: '0'
+              buyer_d_training: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
           entity_type: event_log
-          entity_field: ref_numeric
-          plugin_id: field
-      filters: {  }
-      sorts: {  }
-      title: 'Test view event log'
+          entity_field: ip
+          plugin_id: string
+        name:
+          id: name
+          table: event_log
+          field: name
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: name_op
+            label: Name
+            description: ''
+            use_operator: false
+            operator: name_op
+            identifier: name
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+              shop_administrator: '0'
+              fe_app: '0'
+              visitor_customer: '0'
+              visitor_filial: '0'
+              buyer_admin: '0'
+              buyer_agent: '0'
+              buyer_area_manager_export: '0'
+              buyer_d_training: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: event_log
+          entity_field: name
+          plugin_id: string
+        type:
+          id: type
+          table: event_log
+          field: type
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: type_op
+            label: Type
+            description: ''
+            use_operator: false
+            operator: type_op
+            identifier: type
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+              shop_administrator: '0'
+              fe_app: '0'
+              visitor_customer: '0'
+              visitor_filial: '0'
+              buyer_admin: '0'
+              buyer_agent: '0'
+              buyer_area_manager_export: '0'
+              buyer_d_training: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: event_log
+          entity_field: type
+          plugin_id: string
+      sorts:
+        created:
+          id: created
+          table: event_log
+          field: created
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: DESC
+          exposed: false
+          expose:
+            label: ''
+          granularity: second
+          entity_type: event_log
+          entity_field: created
+          plugin_id: date
+      title: 'View event log'
       header: {  }
       footer: {  }
       empty: {  }
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
+      use_ajax: true
     cache_metadata:
       max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
+        - user.permissions
       tags: {  }
   page_1:
     display_plugin: page
@@ -633,11 +735,22 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: test-view-event-log
+      path: admin/reports/view-event-log
+      menu:
+        type: normal
+        title: 'View Event Log'
+        description: ''
+        expanded: false
+        parent: system.admin_reports
+        weight: 0
+        context: '0'
+        menu_name: admin
     cache_metadata:
       max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
+        - user.permissions
       tags: {  }

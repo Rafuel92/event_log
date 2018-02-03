@@ -18,26 +18,39 @@ use Drupal\user\UserInterface;
  *   id = "event_log",
  *   label = @Translation("Logged events by the event_log module."),
  *   handlers = {
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "list_builder" = "Drupal\event_log\EventLogListBuilder",
  *     "views_data" = "Drupal\event_log\Entity\EventLogViewsData",
  *
  *     "form" = {
- *       "default" = "Drupal\event_log\Form\EventLogDeleteForm",
+ *       "default" = "Drupal\event_log\Form\EventLogForm",
+ *       "add" = "Drupal\event_log\Form\EventLogForm",
+ *       "edit" = "Drupal\event_log\Form\EventLogForm",
  *       "delete" = "Drupal\event_log\Form\EventLogDeleteForm",
  *     },
  *     "access" = "Drupal\event_log\EventLogAccessControlHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\event_log\EventLogHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "event_log",
  *   admin_permission = "administer event log entities",
- *   links = {
- *     "canonical" = "/admin/event_log/{id}",
- *     "delete-form" = "/admin/structure/event_log/{id}/delete",
- *   },
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
+ *     "langcode" = "langcode",
+ *     "status" = "status",
  *   },
+ *   links = {
+ *     "canonical" = "/admin/structure/event_log/{event_log}",
+ *     "add-form" = "/admin/structure/event_log/add",
+ *     "edit-form" = "/admin/structure/event_log/{event_log}/edit",
+ *     "delete-form" = "/admin/structure/event_log/{event_log}/delete",
+ *     "collection" = "/admin/structure/event_log",
+ *   },
+ *   field_ui_base_route = "event_log.settings"
  * )
  */
 class EventLog extends ContentEntityBase implements EventLogInterface {
@@ -51,7 +64,6 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
     parent::preCreate($storage_controller, $values);
     $values += [
       'user_id' => \Drupal::currentUser()->id(),
-      'status' => TRUE,
     ];
   }
 
@@ -163,20 +175,37 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
-      ->setDescription(t('A character value that can be used to reference an object.'))
-      ->setRequired(TRUE)
-      ->setSetting('max_length', 255)
+      ->setDescription(t('The name of the Event log entity.'))
+      ->setSettings([
+        'max_length' => 50,
+        'text_processing' => 0,
+      ])
+      ->setDefaultValue('')
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'string',
-        'weight' => -5,
+        'weight' => -4,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -5,
+        'weight' => -4,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Publishing status'))
+      ->setDescription(t('A boolean indicating whether the Event log is published.'))
+      ->setDefaultValue(TRUE);
+
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
+
 
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))
@@ -287,14 +316,21 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Event log is published.'))
-      ->setDefaultValue(TRUE);
-
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
+    $fields['ref_title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Ref Title'))
+      ->setDescription(t('Title of the considered entity'))
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 7,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 7,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }

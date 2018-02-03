@@ -27,7 +27,7 @@ class EventLogAccessControlHandler extends EntityAccessControlHandler {
         return AccessResult::allowedIfHasPermission($account, 'view published event log entities');
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit event log entities');
+        return AccessResult::forbidden();
 
       case 'delete':
         return AccessResult::allowedIfHasPermission($account, 'delete event log entities');
