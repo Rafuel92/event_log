@@ -1,0 +1,12 @@
+services:
+  logger.channel.event_log:
+     parent: logger.channel_base
+     arguments: ['event_log']
+
+  plugin.manager.event_log_storage_backend:
+    class: Drupal\event_log\StorageBackendPluginManager
+    parent: default_plugin_manager
+
+  event_log.logger:
+    class: Drupal\event_log\Logger
+    arguments: ['@plugin.manager.event_log_storage_backend', '@logger.channel.event_log', '@config.factory']
