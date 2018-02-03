@@ -5,6 +5,7 @@ namespace Drupal\event_log;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManager;
 use Psr\Log\LoggerInterface as DrupalLogger;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -47,6 +48,8 @@ class Logger implements LoggerInterface {
    * @param \Drupal\event_log\StorageBackendPluginManagerInterface $storage_backend_plugin_manager
    * @param \Psr\Log\LoggerInterface $drupal_logger
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request
    */
   public function __construct(
     StorageBackendPluginManagerInterface $storage_backend_plugin_manager,
@@ -83,6 +86,8 @@ class Logger implements LoggerInterface {
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
+   *
+   * @return bool
    */
   public function checkIfEntityIsEnabled(EntityInterface $entity){
     $entity_type_id = $entity->getEntityType()->id();
@@ -117,7 +122,16 @@ class Logger implements LoggerInterface {
     $values['description'][0]['value'] =  $this->getLogDescription($entity,$type);
     $event_log_storage = $this->entityTypeManager->getStorage('event_log');
     $event_log_entity = $event_log_storage->create($values);
-    $event_log_entity->save();
+
+    try {
+      $event_log_entity->save();
+    }
+    catch (EntityStorageException $e) {
+      $this->drupalLogger->error("Errors in saving entity %data: %error", [
+        '%data' => print_r($values, TRUE),
+        '%error' => $e->getMessage(),
+      ]);
+    }
   }
 
   /**
@@ -140,9 +154,31 @@ class Logger implements LoggerInterface {
     return $description;
   }
 
-  protected function PurgeOldLogs(){
-    $maxnum = $this->config->get('event_log.config');
-    //@todo remove old logs
+  /**
+   *
+   */
+  public function PurgeOldLogs(){
+    $config = $this->config->get('event_log.config');
+    $max_records = $config->get('max_records');
+    if ($max_records) {
+      $event_log_storage = $this->entityTypeManager->getStorage('event_log');
+      $query = $event_log_storage->getQuery();
+      $query->sort('created', 'DESC');
+      $results = $query->execute();
+
+      if (!empty($results)) {
+        $delete_ids = array_slice($results, $max_records);
+        $delete_records = $event_log_storage->loadMultiple($delete_ids);
+        try {
+          $event_log_storage->delete($delete_records);
+        } catch (EntityStorageException $e) {
+          $this->drupalLogger->error("Errors in deleting rows %rows: %error", [
+            '%rows' => print_r($delete_records, TRUE),
+            '%error' => $e->getMessage(),
+          ]);
+        }
+      }
+    }
   }
 
 }

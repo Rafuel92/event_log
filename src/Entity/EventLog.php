@@ -19,7 +19,6 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Logged events by the event_log module."),
  *   handlers = {
  *     "views_data" = "Drupal\event_log\Entity\EventLogViewsData",
- *
  *     "form" = {
  *       "default" = "Drupal\event_log\Form\EventLogDeleteForm",
  *       "delete" = "Drupal\event_log\Form\EventLogDeleteForm",

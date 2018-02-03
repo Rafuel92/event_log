@@ -48,14 +48,7 @@ class ConfigForm extends ConfigFormBase {
       '#options' => $potential_entities['config_entities'],
       '#default_value' => $config->get('enabled_config_entities') ? $config->get('enabled_config_entities') : [],
     ];
-    $form['event_log_cron'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Number of config'),
-      '#description' => $this->t('Description '),
-      '#options' => $potential_entities['config_entities'],
-      '#default_value' => $config->get('enabled_config_entities') ? $config->get('enabled_config_entities') : [],
-    ];
-    $form['event_log_cron'] = [
+    $form['event_log_max_records'] = [
       '#type' => 'select',
       '#title' => t('Eventlog messages to keep'),
       '#description' => $this->t('The maximum number of messages to keep in the database event log. Requires a cron maintenance task.'),
@@ -94,7 +87,7 @@ class ConfigForm extends ConfigFormBase {
     $this->config('event_log.config')
       ->set('enabled_content_entities', $form_state->getValue('enabled_content_entities'))
       ->set('enabled_config_entities', $form_state->getValue('enabled_config_entities'))
-      ->set('max_records', $form_state->getValue('max_records'))
+      ->set('max_records', $form_state->getValue('event_log_max_records'))
       ->save();
   }
 
