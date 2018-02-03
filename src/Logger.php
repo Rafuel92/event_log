@@ -111,7 +111,7 @@ class Logger implements LoggerInterface {
     //manage title for standard nodes and name for custom content entities
     $title = isset($entity->toArray()['title']) ? $entity->toArray()['title'][0]['value'] : FALSE;
     if(!$title){
-      $title = 'test';
+      $title = isset($entity->toArray()['name'][0]['value']) ? $entity->toArray()['name'][0]['value'] : '';
     }
     $values['name'][0]['value'] = $title;
     $values['description'][0]['value'] =  $this->getLogDescription($entity,$type);
