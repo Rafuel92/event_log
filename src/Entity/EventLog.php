@@ -16,7 +16,7 @@ use Drupal\user\UserInterface;
  *
  * @ContentEntityType(
  *   id = "event_log",
- *   label = @Translation("Logged events by the event_log module."),
+ *   label = @Translation("Event log"),
  *   handlers = {
  *     "views_data" = "Drupal\event_log\Entity\EventLogViewsData",
  *
