@@ -30,6 +30,7 @@ use Drupal\user\UserInterface;
  *   admin_permission = "administer event log entities",
  *   links = {
  *     "canonical" = "/admin/event_log/{id}",
+ *     "delete-form" = "/admin/structure/event_log/{id}/delete",
  *   },
  *   entity_keys = {
  *     "id" = "id",
