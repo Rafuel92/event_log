@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Contains event_log.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function event_log_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the event_log module.
+    case 'help.page.event_log':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Event Log module') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+

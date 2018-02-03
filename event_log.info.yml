@@ -1,0 +1,5 @@
+name: event_log
+type: module
+description: 'Event Log module'
+core: 8.x
+package: Custom
