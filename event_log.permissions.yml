@@ -1,6 +1,3 @@
-add event log entities:
-  title: 'Create new Event log entities'
-
 administer event log entities:
   title: 'Administer Event log entities'
   description: 'Allow to access the administration form to configure Event log entities.'
@@ -9,11 +6,5 @@ administer event log entities:
 delete event log entities:
   title: 'Delete Event log entities'
 
-edit event log entities:
-  title: 'Edit Event log entities'
-
-view published event log entities:
-  title: 'View published Event log entities'
-
-view unpublished event log entities:
-  title: 'View unpublished Event log entities'
+view event log entities:
+  title: 'View Event log entities'
