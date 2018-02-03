@@ -1,4 +1,4 @@
-name: event_log
+name: event log
 type: module
 description: 'Event Log module'
 core: 8.x

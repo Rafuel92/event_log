@@ -1,0 +1,11 @@
+
+event_log.config_form:
+  path: '/admin/config/event_log'
+  defaults:
+    _form: '\Drupal\event_log\Form\ConfigForm'
+    _title: 'ConfigForm'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+
