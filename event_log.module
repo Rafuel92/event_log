@@ -54,5 +54,5 @@ function event_log_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
  * Implements hook_cron().
  */
 function event_log_cron() {
-  //@TODO remove old logs
+  \Drupal::service('event_log.logger')->PurgeOldLogs();
 }

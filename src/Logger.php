@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Psr\Log\LoggerInterface as DrupalLogger;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class Logger.
@@ -36,6 +37,11 @@ class Logger implements LoggerInterface {
   protected $entityTypeManager;
 
   /**
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $request;
+
+  /**
    * Logger constructor.
    *
    * @param \Drupal\event_log\StorageBackendPluginManagerInterface $storage_backend_plugin_manager
@@ -46,12 +52,14 @@ class Logger implements LoggerInterface {
     StorageBackendPluginManagerInterface $storage_backend_plugin_manager,
     DrupalLogger $drupal_logger,
     ConfigFactoryInterface $config,
-    EntityTypeManager $entity_type_manager
+    EntityTypeManager $entity_type_manager,
+    RequestStack $request
   ) {
     $this->storageBackendPluginManager = $storage_backend_plugin_manager;
     $this->drupalLogger = $drupal_logger;
     $this->config = $config;
     $this->entityTypeManager = $entity_type_manager;
+    $this->request = $request;
   }
 
   /**
@@ -95,7 +103,7 @@ class Logger implements LoggerInterface {
     $values = [];
     $values['type'][0]['value'] = $entity->getEntityType()->id() . '_' . $type;
     $values['operation'][0]['value'] = $type;
-    $values['path'][0]['value'] = \Drupal::request()->getRequestUri();
+    $values['path'][0]['value'] = $this->request->getCurrentRequest()->getRequestUri();
     $values['ref_numeric'][0]['value'] = $entity->id();
     //manage title for standard nodes and name for custom content entities
     $title = $entity->get('title');
@@ -120,7 +128,7 @@ class Logger implements LoggerInterface {
   protected function getLogDescription(EntityInterface $entity, $type){
     $name = \Drupal::currentUser()->getAccountName();
     $uid = \Drupal::currentUser()->id();
-    $description = t('user %name (uid %uid) performed %type operation entity %entityname (id %id)', [
+    $description = t('user %name (uid %uid) performed %type operation on entity %entityname (id %id)', [
         '%name' => $name,
         '%uid' => $uid,
         '%entityname' => $entity->getEntityType()->getLabel(),
@@ -131,5 +139,9 @@ class Logger implements LoggerInterface {
     return $description;
   }
 
+  protected function PurgeOldLogs(){
+    $maxnum = $this->config->get('event_log.config');
+    //@todo remove old logs
+  }
 
 }

@@ -9,4 +9,4 @@ services:
 
   event_log.logger:
     class: Drupal\event_log\Logger
-    arguments: ['@plugin.manager.event_log_storage_backend', '@logger.channel.event_log', '@config.factory','@entity_type.manager']
+    arguments: ['@plugin.manager.event_log_storage_backend', '@logger.channel.event_log', '@config.factory','@entity_type.manager','@request_stack']
