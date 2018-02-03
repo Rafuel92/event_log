@@ -7,6 +7,7 @@ porting of the event log module for drupal
 - Improve canonical view
 - Readame.md
 - License.txt
+- Monolog integration
 
 # todo secondary
 - Config by entity bundle
