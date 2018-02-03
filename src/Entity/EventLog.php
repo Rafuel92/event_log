@@ -21,7 +21,6 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\event_log\EventLogListBuilder",
  *     "views_data" = "Drupal\event_log\Entity\EventLogViewsData",
- *
  *     "form" = {
  *       "default" = "Drupal\event_log\Form\EventLogForm",
  *       "add" = "Drupal\event_log\Form\EventLogForm",
