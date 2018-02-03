@@ -89,6 +89,9 @@ class Logger implements LoggerInterface {
     $event_log_config = $this->config->get('event_log.config');
     $event_log_content_entities = $event_log_config->get('enabled_content_entities') ? $event_log_config->get('enabled_content_entities') : [];
     $event_log_config_entities = $event_log_config->get('enabled_config_entities') ? $event_log_config->get('enabled_config_entities') : [];
+    if($entity_type_id == 'event_log'){
+      return FALSE;
+    }
     if(in_array($entity_type_id,$event_log_content_entities) || in_array($entity_type_id,$event_log_config_entities)){
       return TRUE;
     }
@@ -106,13 +109,11 @@ class Logger implements LoggerInterface {
     $values['path'][0]['value'] = $this->request->getCurrentRequest()->getRequestUri();
     $values['ref_numeric'][0]['value'] = $entity->id();
     //manage title for standard nodes and name for custom content entities
-    $title = $entity->get('title');
-    if($title){
-      $title =  $title->getValue()[0]['value'];
-    } else {
-      $title =  $entity->get('name')->getValue()[0]['value'];
+    $title = isset($entity->toArray()['title']) ? $entity->toArray()['title'][0]['value'] : FALSE;
+    if(!$title){
+      $title = 'test';
     }
-    $values['ref_char'][0]['value'] = $title;
+    $values['name'][0]['value'] = $title;
     $values['description'][0]['value'] =  $this->getLogDescription($entity,$type);
     $event_log_storage = $this->entityTypeManager->getStorage('event_log');
     $event_log_entity = $event_log_storage->create($values);
