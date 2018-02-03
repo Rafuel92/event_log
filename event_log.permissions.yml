@@ -3,8 +3,5 @@ administer event log entities:
   description: 'Allow to access the administration form to configure Event log entities.'
   restrict access: true
 
-delete event log entities:
-  title: 'Delete Event log entities'
-
 view event log entities:
   title: 'View Event log entities'
