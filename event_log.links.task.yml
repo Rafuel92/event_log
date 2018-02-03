@@ -1,0 +1,22 @@
+# Event log routing definition
+event_log.settings_tab:
+  route_name: event_log.settings
+  title: 'Settings'
+  base_route: event_log.settings
+
+entity.event_log.canonical:
+  route_name: entity.event_log.canonical
+  base_route: entity.event_log.canonical
+  title: 'View'
+
+entity.event_log.edit_form:
+  route_name: entity.event_log.edit_form
+  base_route: entity.event_log.canonical
+  title: 'Edit'
+
+entity.event_log.delete_form:
+  route_name:  entity.event_log.delete_form
+  base_route:  entity.event_log.canonical
+  title: Delete
+  weight: 10
+
