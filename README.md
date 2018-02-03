@@ -8,6 +8,7 @@ porting of the event log module for drupal
 - [ ] Readame.md
 - [ ] License.txt
 - [ ] Monolog integration
+- [ ] Manage Authentication Events
 
 # todo secondary
 - [ ] Config by entity bundle
