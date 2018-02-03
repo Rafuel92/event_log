@@ -47,6 +47,7 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
     parent::preCreate($storage_controller, $values);
     $values += [
       'user_id' => \Drupal::currentUser()->id(),
+      'status' => 1
     ];
   }
 
