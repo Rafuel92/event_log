@@ -1,5 +1,0 @@
-entity.event_log.add_form:
-  route_name: entity.event_log.add_form
-  title: 'Add Event log'
-  appears_on:
-    - entity.event_log.collection

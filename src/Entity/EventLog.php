@@ -18,20 +18,13 @@ use Drupal\user\UserInterface;
  *   id = "event_log",
  *   label = @Translation("Logged events by the event_log module."),
  *   handlers = {
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\event_log\EventLogListBuilder",
  *     "views_data" = "Drupal\event_log\Entity\EventLogViewsData",
  *
  *     "form" = {
- *       "default" = "Drupal\event_log\Form\EventLogForm",
- *       "add" = "Drupal\event_log\Form\EventLogForm",
- *       "edit" = "Drupal\event_log\Form\EventLogForm",
+ *       "default" = "Drupal\event_log\Form\EventLogDeleteForm",
  *       "delete" = "Drupal\event_log\Form\EventLogDeleteForm",
  *     },
  *     "access" = "Drupal\event_log\EventLogAccessControlHandler",
- *     "route_provider" = {
- *       "html" = "Drupal\event_log\EventLogHtmlRouteProvider",
- *     },
  *   },
  *   base_table = "event_log",
  *   admin_permission = "administer event log entities",
@@ -40,17 +33,7 @@ use Drupal\user\UserInterface;
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
- *     "langcode" = "langcode",
- *     "status" = "status",
  *   },
- *   links = {
- *     "canonical" = "/admin/structure/event_log/{event_log}",
- *     "add-form" = "/admin/structure/event_log/add",
- *     "edit-form" = "/admin/structure/event_log/{event_log}/edit",
- *     "delete-form" = "/admin/structure/event_log/{event_log}/delete",
- *     "collection" = "/admin/structure/event_log",
- *   },
- *   field_ui_base_route = "event_log.settings"
  * )
  */
 class EventLog extends ContentEntityBase implements EventLogInterface {
@@ -138,7 +121,7 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
    * {@inheritdoc}
    */
   public function setPublished($published) {
-    $this->set('status', $published ? TRUE : FALSE);
+    $this->set('status', TRUE);
     return $this;
   }
 
@@ -175,20 +158,127 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Event log entity.'))
-      ->setSettings([
-        'max_length' => 50,
-        'text_processing' => 0,
-      ])
-      ->setDefaultValue('')
+      ->setDescription(t('A character value that can be used to reference an object.'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'string',
-        'weight' => -4,
+        'weight' => -5,
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -4,
+        'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Type'))
+      ->setDescription(t('Event handler type.'))
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['operation'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Operation'))
+      ->setDescription(t('The operation performed.'))
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 1,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 1,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['path'] = BaseFieldDefinition::create('path')
+      ->setLabel(t('Path'))
+      ->setDescription(t('Current path.'))
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 2,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'path',
+        'weight' => 2,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setComputed(TRUE);
+
+    $fields['ref_numeric'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Ref numeric'))
+      ->setDescription(t('The form id of the submitted form.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'number_integer',
+        'weight' => 4,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'number',
+        'weight' => 4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['description'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Description'))
+      ->setDescription(t('Description of the event, in HTML.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 5,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['info'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Info'))
+      ->setDescription(t('Informative data, such as the object before modification (serialized).'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 6,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 6,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['ip'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('IP'))
+      ->setDescription(t('IP address of the visitor that triggered this event.'))
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 7,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 7,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
@@ -201,10 +291,6 @@ class EventLog extends ContentEntityBase implements EventLogInterface {
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the entity was created.'));
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
 
     return $fields;
   }

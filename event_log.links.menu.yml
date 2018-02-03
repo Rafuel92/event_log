@@ -5,17 +5,3 @@ event_log.config_form:
   parent: system.admin_config_system
   weight: 99
 
-
-# Event log menu items definition
-entity.event_log.collection:
-  title: 'Event log list'
-  route_name: entity.event_log.collection
-  description: 'List Event log entities'
-  parent: system.admin_structure
-  weight: 100
-
-event_log.admin.structure.settings:
-  title: 'Event log settings'
-  description: 'Configure Event log entities'
-  route_name: event_log.settings
-  parent: system.admin_structure
